@@ -66,3 +66,19 @@ vcpkg_installed/
 # test output & cache
 Testing/
 .cache/
+
+# Environnements virtuels Python
+venv/
+venv312/
+.venv/
+
+# Fichiers Python temporaires
+__pycache__/
+*.py[cod]
+
+# Notebooks et outils
+.ipynb_checkpoints/
+.vscode/
+
+# Fichiers générés
+*.png
