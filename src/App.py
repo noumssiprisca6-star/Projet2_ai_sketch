@@ -7,6 +7,9 @@ import tkinter as tk
 from tkinter import filedialog, messagebox
 from PIL import Image, ImageDraw
 
+# Module d'intégration : fait le lien avec le modèle d'Élisabeth (predict.py)
+from integration import Reconnaisseur, ErreurModele, formater_resultat
+
 
 class AISketchApp:
     """Interface graphique de dessin pour le projet AI Sketch."""
@@ -47,6 +50,9 @@ class AISketchApp:
         # Image Pillow utilisée pour enregistrer le dessin
         self.image = None
         self.dessin = None
+
+        # Objet qui appelle le modèle de reconnaissance (chargé au 1er clic)
+        self.reconnaisseur = Reconnaisseur()
 
         # Création de l'interface
         self.creer_interface()
@@ -620,17 +626,36 @@ class AISketchApp:
             )
 
     def reconnaitre_dessin(self):
-        """Prépare le bouton de reconnaissance sans appeler le modèle."""
+        """Envoie le dessin au modèle et affiche la catégorie reconnue."""
 
-        self.resultat.config(
-            text=(
-                "Le modèle de reconnaissance n'est pas encore connecté."
+        # Sécurité : l'image Pillow n'existe pas tant que le canevas n'est pas affiché
+        if self.image is None:
+            messagebox.showwarning(
+                "Aucun dessin",
+                "La zone de dessin n'est pas encore prête."
             )
-        )
+            return
 
-        self.statut.config(
-            text="Interface prête ; reconnaissance en attente du modèle."
-        )
+        # Message d'attente (le 1er appel charge le modèle : quelques secondes)
+        self.statut.config(text="Analyse du dessin en cours...")
+        self.root.update_idletasks()
+
+        try:
+            # On passe l'image Pillow et l'épaisseur du pinceau choisie
+            classe, score = self.reconnaisseur.predire(
+                self.image,
+                epaisseur_trait=self.taille_pinceau.get()
+            )
+        except ErreurModele as erreur:
+            # Modèle absent ou bibliothèque manquante : message clair, pas de plantage
+            messagebox.showerror("Modèle indisponible", str(erreur))
+            self.statut.config(text="Modèle indisponible.")
+            return
+
+        # Texte prêt à afficher (gère aussi le cas « dessin vide » et « pas sûr »)
+        texte, _est_sur = formater_resultat(classe, score)
+        self.resultat.config(text=texte)
+        self.statut.config(text="Reconnaissance terminée.")
 
 
 # ============================================================
