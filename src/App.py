@@ -7,7 +7,6 @@ import tkinter as tk
 from tkinter import filedialog, messagebox
 from PIL import Image, ImageDraw
 
-
 class AISketchApp:
     """Interface graphique de dessin pour le projet AI Sketch."""
 
@@ -29,16 +28,11 @@ class AISketchApp:
         self.couleur_texte = "#1E293B"
         self.couleur_secondaire = "#64748B"
         self.couleur_bordure = "#E2E8F0"
-
       
         # Variables du pinceau et de la gomme
         self.taille_pinceau = tk.IntVar(value=5)
         self.couleur_pinceau = "#172554"
-
-        # Indique si le mode gomme est activé
         self.mode_gomme = False
-
-
 
         # Position précédente de la souris
         self.x_precedent = None
@@ -47,7 +41,7 @@ class AISketchApp:
         # Image Pillow utilisée pour enregistrer le dessin
         self.image = None
         self.dessin = None
-
+        
         # Création de l'interface
         self.creer_interface()
 
@@ -218,8 +212,6 @@ class AISketchApp:
         )
         bouton_gomme.pack(side="left", padx=5)
 
-
-
         bouton_enregistrer = tk.Button(
             cadre_boutons,
             text="Enregistrer",
@@ -253,7 +245,47 @@ class AISketchApp:
             cursor="hand2"
         )
         bouton_reconnaitre.pack(side="left", padx=5)
+        
+        # Ajoute un cadre pour la palette de couleurs
+        cadre_palette = tk.LabelFrame(
+            cadre_boutons,
+            text="Couleur du pinceau",
+            padx=5,
+            pady=5
+        )
+        cadre_palette.pack(side="left", padx=10)
 
+        # Définit les couleurs disponibles
+        couleurs = [
+            ("Noir", "#000000"),
+            ("Rouge", "#FF0000"),
+            ("Bleu", "#0000FF"),
+            ("Vert", "#008000"),
+            ("Jaune", "#FFFF00"),
+            ("Violet", "#800080"),
+            ("Orange", "#FFA500"),
+            ("Rose", "#FF69B4")
+        ]
+
+        # Crée un bouton pour chaque couleur
+        for nom, couleur in couleurs:
+            bouton_couleur = tk.Button(
+                cadre_palette,
+                bg=couleur,
+                width=3,
+                height=1,
+                command=lambda c=couleur: self.choisir_couleur(c)
+            )
+            bouton_couleur.pack(side="left", padx=2)
+
+            # Affiche le nom de la couleur dans la barre de statut au survol
+            bouton_couleur.bind(
+                "<Enter>",
+                lambda evenement, n=nom: self.statut.config(
+                text=f"Couleur : {n}"
+                )
+            )
+            
         # ----------------------------------------------------
         # 4. ZONE DE DESSIN
         # ----------------------------------------------------
@@ -463,6 +495,20 @@ class AISketchApp:
         # Informe l'utilisateur que le dessin a commencé
         self.statut.config(text="Dessin en cours...")
 
+    def choisir_couleur(self, couleur):
+        """Change la couleur du pinceau."""
+
+        # Enregistre la couleur choisie
+        self.couleur_pinceau = couleur
+
+        # Désactive la gomme pour reprendre le dessin
+        self.mode_gomme = False
+
+        # Informe l'utilisateur du changement
+        self.statut.config(
+            text=f"Couleur sélectionnée : {couleur}"
+        )
+
     def dessiner(self, evenement):
         """Actualise le trait complet pour obtenir un tracé plus fluide."""
 
@@ -631,7 +677,6 @@ class AISketchApp:
         self.statut.config(
             text="Interface prête ; reconnaissance en attente du modèle."
         )
-
 
 # ============================================================
 # POINT D'ENTRÉE DU PROGRAMME
