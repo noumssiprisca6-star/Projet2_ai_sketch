@@ -33,7 +33,7 @@ RESULTS_DIR = os.path.join(ROOT_DIR, "results")   # graphiques du rapport
 # ------------------------------------------------------------
 # PARAMÈTRES (modifie-les ici, pas dans le reste du code)
 # ------------------------------------------------------------
-CLASSES = ["car", "cat", "house", "sun"]  # tree retiré temporairement (fichier incomplet)
+CLASSES = ["airplane", "apple", "car", "cat", "fish", "house", "star", "sun", "tree", "umbrella"]  # (fichier complet)
 N_PER_CLASS = 10000                               # dessins utilisés par catégorie
 SEED = 42                                         # rend les résultats reproductibles
 
